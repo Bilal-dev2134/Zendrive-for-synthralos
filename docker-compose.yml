@@ -1,0 +1,31 @@
+services:
+  zendriver:
+    build: .
+    container_name: zendriver-worker
+    ports:
+      - '8895:8895'
+    # Chromium crashes ("DevToolsActivePort file doesn't exist") under the
+    # default 64MB /dev/shm. Same reason the crawl4ai worker runs 4gb.
+    shm_size: 2gb
+    # Interpolated so Coolify's own Environment Variables tab can override them
+    # without editing this file; the defaults are what you want in production.
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ZENDRIVER_HEADLESS=${ZENDRIVER_HEADLESS:-false}
+      - ZENDRIVER_MAX_CONCURRENCY=${ZENDRIVER_MAX_CONCURRENCY:-4}
+      - ZENDRIVER_MAX_BROWSERS=${ZENDRIVER_MAX_BROWSERS:-4}
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+    restart: always
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - import urllib.request;urllib.request.urlopen('http://localhost:8895/health')
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s

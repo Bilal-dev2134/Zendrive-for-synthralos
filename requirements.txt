@@ -1,0 +1,6 @@
+# Pin these to the versions the first successful build produces (`pip freeze`
+# inside the container) — an unpinned Zendriver bump can change the CDP surface
+# the proxy-auth handler in app.py depends on.
+zendriver
+fastapi
+uvicorn[standard]
