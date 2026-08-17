@@ -10,11 +10,19 @@ ENV PYTHONUNBUFFERED=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends \
       chromium \
       xvfb \
+      xauth \
       dumb-init \
       ca-certificates \
       fonts-liberation \
       fonts-noto-color-emoji \
     && rm -rf /var/lib/apt/lists/*
+
+# `xauth` is listed explicitly because it is only a *Recommends* of `xvfb`, and
+# --no-install-recommends therefore skips it. `xvfb-run` shells out to `xauth` to
+# build its auth file, so without it the container exits immediately on start with
+# "xauth: command not found" — a build that succeeds and a container that dies.
+# Verified at image build time so the failure can't reach runtime again.
+RUN command -v xauth >/dev/null && command -v xvfb-run >/dev/null
 
 WORKDIR /app
 COPY requirements.txt .
