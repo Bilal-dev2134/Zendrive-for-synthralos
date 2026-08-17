@@ -1,0 +1,8 @@
+# Pin LF in the repository regardless of any contributor's core.autocrlf setting.
+#
+# Not currently a live problem — the blobs here are already LF — but the Dockerfile
+# uses backslash line-continuations in both the `RUN apt-get ...` block and the
+# `CMD [...]`, and a `\` followed by CRLF breaks Docker's parser with an error that
+# points nowhere near the real cause. This makes that guarantee explicit rather than
+# dependent on each machine's git config.
+* text=auto eol=lf
